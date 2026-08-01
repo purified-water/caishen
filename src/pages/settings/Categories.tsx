@@ -4,7 +4,6 @@ import {
   useCategories,
   useCreateCategory,
   useDeleteCategory,
-  useSeedDefaultCategories,
   useUpdateCategory,
 } from '../../hooks/useCategories'
 import type { Category, CategoryType } from '../../types/database'
@@ -14,7 +13,6 @@ export function CategoriesSettings() {
   const createCategory = useCreateCategory()
   const updateCategory = useUpdateCategory()
   const deleteCategory = useDeleteCategory()
-  const seedDefaults = useSeedDefaultCategories()
 
   const [tab, setTab] = useState<CategoryType>('expense')
   const [name, setName] = useState('')
@@ -47,16 +45,7 @@ export function CategoriesSettings() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-slate-900">Categories</h1>
-        <button
-          onClick={() => seedDefaults.mutate(categories ?? [])}
-          disabled={seedDefaults.isPending}
-          className="rounded border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
-        >
-          Nhập danh mục mặc định
-        </button>
-      </div>
+      <h1 className="text-xl font-semibold text-slate-900">Categories</h1>
 
       <div className="flex gap-2">
         <button
@@ -96,9 +85,7 @@ export function CategoriesSettings() {
       {isLoading ? (
         <p className="text-sm text-slate-500">Đang tải...</p>
       ) : filtered.length === 0 ? (
-        <p className="text-sm text-slate-500">
-          Chưa có danh mục nào. Bấm "Nhập danh mục mặc định" ở trên để tạo nhanh.
-        </p>
+        <p className="text-sm text-slate-500">Chưa có danh mục nào.</p>
       ) : (
         <ul className="divide-y divide-slate-200 rounded border border-slate-200 bg-white">
           {filtered.map((category) => (

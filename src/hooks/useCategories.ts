@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { DEFAULT_CATEGORIES } from '../lib/defaultCategories'
 import type { Category, CategoryType } from '../types/database'
 
 const KEY = ['categories']
@@ -53,29 +52,6 @@ export function useUpdateCategory() {
         .from('categories')
         .update({ name: input.name, type: input.type, icon: input.icon ?? null })
         .eq('id', input.id)
-      if (error) throw error
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
-  })
-}
-
-export function useSeedDefaultCategories() {
-  const queryClient = useQueryClient()
-  const { user } = useAuth()
-
-  return useMutation({
-    mutationFn: async (existing: Category[]) => {
-      const existingKeys = new Set(
-        existing.map((c) => `${c.type}:${c.name.trim().toLowerCase()}`),
-      )
-      const missing = DEFAULT_CATEGORIES.filter(
-        (c) => !existingKeys.has(`${c.type}:${c.name.toLowerCase()}`),
-      )
-      if (missing.length === 0) return
-
-      const { error } = await supabase.from('categories').insert(
-        missing.map((c) => ({ user_id: user!.id, name: c.name, type: c.type })),
-      )
       if (error) throw error
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
