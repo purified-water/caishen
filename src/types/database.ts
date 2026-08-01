@@ -41,6 +41,17 @@ export type BudgetDetailWithCategory = BudgetDetail & {
   category: Pick<Category, 'id' | 'name' | 'type'>
 }
 
+export type BudgetAccountBalance = {
+  id: string
+  monthly_budget_id: string
+  account_id: string
+  start_balance: number
+}
+
+export type BudgetAccountBalanceWithAccount = BudgetAccountBalance & {
+  account: Pick<Account, 'id' | 'name' | 'type'>
+}
+
 export type Transaction = {
   id: string
   user_id: string

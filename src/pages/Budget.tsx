@@ -3,16 +3,17 @@ import { Trash2 } from 'lucide-react'
 import { MoneyInput } from '../components/MoneyInput'
 import { useCategories } from '../hooks/useCategories'
 import {
+  useAccountBalances,
   useBudgetDetails,
   useCreateMonthlyBudget,
   useDeleteMonthlyBudget,
   useMonthlyBudgets,
   useRemoveBudgetDetail,
-  useUpdateStartBalance,
+  useUpdateAccountBalance,
   useUpsertBudgetDetail,
 } from '../hooks/useMonthlyBudgets'
 import { formatMonthLabel, nextMonthKey, toMonthKey } from '../lib/month'
-import type { BudgetDetailWithCategory, MonthlyBudget } from '../types/database'
+import type { BudgetAccountBalanceWithAccount, BudgetDetailWithCategory } from '../types/database'
 
 function BudgetDetailRow({
   detail,
@@ -61,27 +62,36 @@ function BudgetDetailRow({
   )
 }
 
-function StartBalanceEditor({ budget }: { budget: MonthlyBudget }) {
-  const updateStartBalance = useUpdateStartBalance()
-  const [value, setValue] = useState(String(budget.start_balance))
+function AccountBalanceRow({
+  balance,
+  monthlyBudgetId,
+}: {
+  balance: BudgetAccountBalanceWithAccount
+  monthlyBudgetId: string
+}) {
+  const updateBalance = useUpdateAccountBalance(monthlyBudgetId)
+  const [value, setValue] = useState(String(balance.start_balance))
 
   useEffect(() => {
-    setValue(String(budget.start_balance))
-  }, [budget.start_balance])
+    setValue(String(balance.start_balance))
+  }, [balance.start_balance])
 
   function handleBlur() {
     const parsed = Number(value)
-    if (Number.isNaN(parsed) || parsed === budget.start_balance) return
-    updateStartBalance.mutate({ id: budget.id, startBalance: parsed })
+    if (Number.isNaN(parsed) || parsed === balance.start_balance) return
+    updateBalance.mutate({ accountId: balance.account.id, startBalance: parsed })
   }
 
   return (
-    <MoneyInput
-      value={value}
-      onChange={setValue}
-      onBlur={handleBlur}
-      className="w-40 rounded border border-slate-300 px-2 py-1 text-sm"
-    />
+    <div className="flex items-center justify-between gap-3">
+      <span className="min-w-0 truncate text-sm text-slate-700">{balance.account.name}</span>
+      <MoneyInput
+        value={value}
+        onChange={setValue}
+        onBlur={handleBlur}
+        className="w-36 shrink-0 rounded border border-slate-300 px-2 py-1 text-right text-sm"
+      />
+    </div>
   )
 }
 
@@ -150,6 +160,9 @@ export function Budget() {
 
   const selectedBudget = budgets?.find((b) => b.id === selectedMonthId) ?? null
   const { data: details, isLoading: detailsLoading } = useBudgetDetails(
+    selectedBudget?.id ?? null,
+  )
+  const { data: accountBalances, isLoading: balancesLoading } = useAccountBalances(
     selectedBudget?.id ?? null,
   )
 
@@ -225,11 +238,35 @@ export function Budget() {
 
           {selectedBudget && (
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="space-y-2">
                 <span className="text-sm font-medium text-slate-700">
-                  Start Balance
+                  Start Balance by account
                 </span>
-                <StartBalanceEditor budget={selectedBudget} />
+                {balancesLoading ? (
+                  <p className="text-sm text-slate-500">Loading accounts...</p>
+                ) : !accountBalances || accountBalances.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    No active accounts yet. Add one in Accounts settings.
+                  </p>
+                ) : (
+                  <div className="space-y-2 rounded border border-slate-200 bg-white p-3">
+                    {accountBalances.map((b) => (
+                      <AccountBalanceRow
+                        key={b.id}
+                        balance={b}
+                        monthlyBudgetId={selectedBudget.id}
+                      />
+                    ))}
+                    <div className="flex items-center justify-between border-t border-slate-200 pt-2">
+                      <span className="text-sm font-semibold text-slate-900">Total</span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        {accountBalances
+                          .reduce((sum, b) => sum + Number(b.start_balance), 0)
+                          .toLocaleString('en-US')}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {detailsLoading ? (
