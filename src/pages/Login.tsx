@@ -30,14 +30,15 @@ export function Login() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-4 rounded-lg bg-white p-6 shadow"
       >
-        <h1 className="text-xl font-semibold text-slate-900">
-          Đăng nhập Caishen
-        </h1>
+        <div className="flex flex-col items-center gap-2">
+          <img src="/ic-app-icon.png" alt="Caishen" className="h-16 w-16" />
+          <h1 className="text-xl font-semibold text-slate-900">
+            Đăng nhập Caishen
+          </h1>
+        </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-700">
-            Username
-          </label>
+          <label className="text-sm font-medium text-slate-700">Username</label>
           <input
             type="text"
             required
@@ -48,9 +49,7 @@ export function Login() {
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-medium text-slate-700">
-            Password
-          </label>
+          <label className="text-sm font-medium text-slate-700">Password</label>
           <input
             type="password"
             required
@@ -67,16 +66,16 @@ export function Login() {
           disabled={submitting}
           className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
         </button>
 
         <p className="text-center text-sm text-slate-600">
-          Chưa có tài khoản?{' '}
+          Chưa có tài khoản?{" "}
           <Link to="/register" className="font-medium text-slate-900 underline">
             Đăng ký
           </Link>
         </p>
       </form>
     </div>
-  )
+  );
 }

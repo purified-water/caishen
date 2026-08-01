@@ -66,17 +66,17 @@ export function CategoriesSettings() {
         </button>
       </div>
 
-      <form onSubmit={handleCreate} className="flex gap-2">
+      <form onSubmit={handleCreate} className="flex flex-wrap gap-2">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={`Tên danh mục ${tab === 'expense' ? 'chi tiêu' : 'thu nhập'}`}
-          className="flex-1 rounded border border-slate-300 px-3 py-2 text-sm"
+          className="min-w-0 flex-1 rounded border border-slate-300 px-3 py-2 text-sm"
         />
         <button
           type="submit"
           disabled={createCategory.isPending}
-          className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="shrink-0 rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           Thêm
         </button>
@@ -89,19 +89,24 @@ export function CategoriesSettings() {
       ) : (
         <ul className="divide-y divide-slate-200 rounded border border-slate-200 bg-white">
           {filtered.map((category) => (
-            <li key={category.id} className="flex items-center justify-between px-4 py-2.5">
+            <li
+              key={category.id}
+              className="flex items-center justify-between gap-2 px-4 py-2.5"
+            >
               {editingId === category.id ? (
                 <input
                   autoFocus
                   value={editingName}
                   onChange={(e) => setEditingName(e.target.value)}
-                  className="flex-1 rounded border border-slate-300 px-2 py-1 text-sm"
+                  className="min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-sm"
                 />
               ) : (
-                <span className="text-sm text-slate-800">{category.name}</span>
+                <span className="min-w-0 truncate text-sm text-slate-800">
+                  {category.name}
+                </span>
               )}
 
-              <div className="flex items-center gap-1">
+              <div className="flex shrink-0 items-center gap-1">
                 {editingId === category.id ? (
                   <>
                     <button

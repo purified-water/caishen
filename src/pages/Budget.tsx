@@ -36,17 +36,19 @@ function BudgetDetailRow({
 
   return (
     <tr className="border-b border-slate-100 last:border-0">
-      <td className="px-4 py-2 text-sm text-slate-800">{detail.category.name}</td>
+      <td className="max-w-40 truncate px-4 py-2 text-sm text-slate-800">
+        {detail.category.name}
+      </td>
       <td className="px-4 py-2 text-right">
         <input
           type="number"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={handleBlur}
-          className="w-32 rounded border border-slate-300 px-2 py-1 text-right text-sm"
+          className="w-28 rounded border border-slate-300 px-2 py-1 text-right text-sm"
         />
       </td>
-      <td className="px-4 py-2 text-right">
+      <td className="px-2 py-2 text-right">
         <button
           onClick={() => removeDetail.mutate(detail.id)}
           title="Bỏ danh mục này khỏi tháng"
@@ -110,11 +112,11 @@ function AddCategoryToBudget({
   if (available.length === 0) return null
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <select
         value={categoryId}
         onChange={(e) => setCategoryId(e.target.value)}
-        className="rounded border border-slate-300 px-3 py-2 text-sm"
+        className="min-w-0 flex-1 rounded border border-slate-300 px-3 py-2 text-sm"
       >
         <option value="">+ Thêm danh mục vào tháng này...</option>
         {available.map((c) => (
@@ -126,7 +128,7 @@ function AddCategoryToBudget({
       <button
         onClick={handleAdd}
         disabled={!categoryId || upsertDetail.isPending}
-        className="rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+        className="shrink-0 rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
       >
         Thêm
       </button>
@@ -178,7 +180,7 @@ export function Budget() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold text-slate-900">Budget</h1>
         <button
           onClick={handleCreateMonth}
@@ -199,7 +201,7 @@ export function Budget() {
         </p>
       ) : (
         <>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <select
               value={selectedMonthId ?? ''}
               onChange={(e) => setSelectedMonthId(e.target.value)}
@@ -224,7 +226,7 @@ export function Budget() {
 
           {selectedBudget && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium text-slate-700">
                   Start Balance
                 </span>
@@ -238,28 +240,30 @@ export function Budget() {
                   Chưa có danh mục chi tiêu nào để lập ngân sách.
                 </p>
               ) : (
-                <table className="w-full overflow-hidden rounded border border-slate-200 bg-white">
-                  <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50">
-                      <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">
-                        Category
-                      </th>
-                      <th className="px-4 py-2 text-right text-xs font-medium uppercase text-slate-500">
-                        Budget Amount
-                      </th>
-                      <th className="w-10 px-4 py-2"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {details.map((detail) => (
-                      <BudgetDetailRow
-                        key={detail.id}
-                        detail={detail}
-                        monthlyBudgetId={selectedBudget.id}
-                      />
-                    ))}
-                  </tbody>
-                </table>
+                <div className="overflow-x-auto rounded border border-slate-200 bg-white">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-200 bg-slate-50">
+                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-slate-500">
+                          Category
+                        </th>
+                        <th className="px-4 py-2 text-right text-xs font-medium uppercase text-slate-500">
+                          Budget Amount
+                        </th>
+                        <th className="w-10 px-4 py-2"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {details.map((detail) => (
+                        <BudgetDetailRow
+                          key={detail.id}
+                          detail={detail}
+                          monthlyBudgetId={selectedBudget.id}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
 
               <AddCategoryToBudget

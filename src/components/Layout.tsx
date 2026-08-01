@@ -1,32 +1,60 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useEffect, useState } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Menu, Plus, X } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { QuickLogSheet } from "./QuickLogSheet";
+
+const navItems = [
+  { to: "/", label: "Dashboard", end: true },
+  { to: "/budget", label: "Budget", end: false },
+  { to: "/settings/categories", label: "Categories", end: false },
+  { to: "/settings/accounts", label: "Accounts", end: false },
+];
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `rounded px-3 py-2 text-sm font-medium ${
-    isActive ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
-  }`
+    isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+  }`;
+
+const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+  `block rounded px-3 py-2.5 text-sm font-medium ${
+    isActive ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"
+  }`;
 
 export function Layout() {
-  const { signOut } = useAuth()
+  const { signOut } = useAuth();
+  const [quickLogOpen, setQuickLogOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => setMenuOpen(false), [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
+    <div className="min-h-screen overflow-x-hidden bg-slate-50">
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-          <span className="text-lg font-semibold text-slate-900">Caishen</span>
-          <nav className="flex items-center gap-1">
-            <NavLink to="/" end className={navLinkClass}>
-              Dashboard
-            </NavLink>
-            <NavLink to="/budget" className={navLinkClass}>
-              Budget
-            </NavLink>
-            <NavLink to="/settings/categories" className={navLinkClass}>
-              Categories
-            </NavLink>
-            <NavLink to="/settings/accounts" className={navLinkClass}>
-              Accounts
-            </NavLink>
+          <div className="flex items-center gap-2">
+            <img
+              src="/ic-app-icon.png"
+              alt=""
+              className="h-8 w-8 rounded-full"
+            />
+            <span className="text-lg font-semibold text-slate-900">
+              Caishen
+            </span>
+          </div>
+
+          <nav className="hidden items-center gap-1 md:flex">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={navLinkClass}
+              >
+                {item.label}
+              </NavLink>
+            ))}
             <button
               onClick={() => signOut()}
               className="rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
@@ -34,11 +62,51 @@ export function Layout() {
               Đăng xuất
             </button>
           </nav>
+
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Mở menu"
+            className="rounded p-2 text-slate-600 hover:bg-slate-100 md:hidden"
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
+
+        {menuOpen && (
+          <nav className="space-y-1 border-t border-slate-200 px-4 py-3 md:hidden">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={mobileNavLinkClass}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            <button
+              onClick={() => signOut()}
+              className="block w-full rounded px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100"
+            >
+              Đăng xuất
+            </button>
+          </nav>
+        )}
       </header>
-      <main className="mx-auto max-w-4xl px-4 py-6">
+
+      <main className="mx-auto max-w-4xl px-4 py-6 pb-24">
         <Outlet />
       </main>
+
+      <button
+        onClick={() => setQuickLogOpen(true)}
+        aria-label="Ghi giao dịch nhanh"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg hover:bg-slate-800"
+      >
+        <Plus size={24} />
+      </button>
+
+      {quickLogOpen && <QuickLogSheet onClose={() => setQuickLogOpen(false)} />}
     </div>
-  )
+  );
 }
