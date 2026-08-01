@@ -18,7 +18,7 @@ export function Login() {
       await signIn(username, password)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng nhập thất bại')
+      setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
       setSubmitting(false)
     }
@@ -33,7 +33,7 @@ export function Login() {
         <div className="flex flex-col items-center gap-2">
           <img src="/ic-app-icon.png" alt="Caishen" className="h-16 w-16" />
           <h1 className="text-xl font-semibold text-slate-900">
-            Đăng nhập Caishen
+            Log in to Caishen
           </h1>
         </div>
 
@@ -66,13 +66,13 @@ export function Login() {
           disabled={submitting}
           className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {submitting ? "Đang đăng nhập..." : "Đăng nhập"}
+          {submitting ? "Logging in..." : "Log in"}
         </button>
 
         <p className="text-center text-sm text-slate-600">
-          Chưa có tài khoản?{" "}
+          Don't have an account?{" "}
           <Link to="/register" className="font-medium text-slate-900 underline">
-            Đăng ký
+            Sign up
           </Link>
         </p>
       </form>

@@ -54,3 +54,9 @@ export type Transaction = {
   description: string | null
   created_at: string
 }
+
+export type TransactionWithRelations = Transaction & {
+  category: Pick<Category, 'id' | 'name'> | null
+  from_account: Pick<Account, 'id' | 'name'> | null
+  to_account: Pick<Account, 'id' | 'name'> | null
+}

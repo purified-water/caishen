@@ -63,7 +63,7 @@ export function AccountsSettings() {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Tên nguồn tiền (VD: TPBank, Cash)"
+          placeholder="Account name (e.g. TPBank, Cash)"
           className="min-w-0 flex-1 rounded border border-slate-300 px-3 py-2 text-sm"
         />
         <select
@@ -79,14 +79,14 @@ export function AccountsSettings() {
           disabled={createAccount.isPending}
           className="shrink-0 rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          Thêm
+          Add
         </button>
       </form>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Đang tải...</p>
+        <p className="text-sm text-slate-500">Loading...</p>
       ) : (accounts ?? []).length === 0 ? (
-        <p className="text-sm text-slate-500">Chưa có nguồn tiền nào.</p>
+        <p className="text-sm text-slate-500">No accounts yet.</p>
       ) : (
         <ul className="divide-y divide-slate-200 rounded border border-slate-200 bg-white">
           {(accounts ?? []).map((account) => (
@@ -139,7 +139,7 @@ export function AccountsSettings() {
                       onClick={() => toggleActive(account)}
                       className="rounded px-2 py-1 text-xs text-slate-500 hover:bg-slate-100"
                     >
-                      {account.is_active ? 'Tắt' : 'Bật'}
+                      {account.is_active ? 'Disable' : 'Enable'}
                     </button>
                     <button
                       onClick={() => startEdit(account)}

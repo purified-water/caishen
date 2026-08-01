@@ -16,11 +16,11 @@ export function Register() {
     setError(null)
 
     if (!isValidUsername(username)) {
-      setError('Username phải 3-20 ký tự, chỉ gồm chữ thường, số, dấu . _ -')
+      setError('Username must be 3-20 characters: lowercase letters, numbers, . _ -')
       return
     }
     if (password.length < 6) {
-      setError('Password phải có ít nhất 6 ký tự')
+      setError('Password must be at least 6 characters')
       return
     }
 
@@ -29,7 +29,7 @@ export function Register() {
       await signUp(username, password)
       navigate('/', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng ký thất bại')
+      setError(err instanceof Error ? err.message : 'Sign up failed')
     } finally {
       setSubmitting(false)
     }
@@ -44,7 +44,7 @@ export function Register() {
         <div className="flex flex-col items-center gap-2">
           <img src="/ic-app-icon.png" alt="Caishen" className="h-16 w-16" />
           <h1 className="text-xl font-semibold text-slate-900">
-            Tạo tài khoản Caishen
+            Create your Caishen account
           </h1>
         </div>
 
@@ -77,13 +77,13 @@ export function Register() {
           disabled={submitting}
           className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {submitting ? "Đang tạo tài khoản..." : "Đăng ký"}
+          {submitting ? "Creating account..." : "Sign up"}
         </button>
 
         <p className="text-center text-sm text-slate-600">
-          Đã có tài khoản?{" "}
+          Already have an account?{" "}
           <Link to="/login" className="font-medium text-slate-900 underline">
-            Đăng nhập
+            Log in
           </Link>
         </p>
       </form>

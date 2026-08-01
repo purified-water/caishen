@@ -6,6 +6,7 @@ import { QuickLogSheet } from "./QuickLogSheet";
 
 const navItems = [
   { to: "/", label: "Dashboard", end: true },
+  { to: "/transactions", label: "Transactions", end: false },
   { to: "/budget", label: "Budget", end: false },
   { to: "/settings/categories", label: "Categories", end: false },
   { to: "/settings/accounts", label: "Accounts", end: false },
@@ -27,12 +28,19 @@ export function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
+  const navigateHome = () => {
+    window.location.href = "/";
+  };
+
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-50">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+        <div
+          className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 cursor-pointer"
+          onClick={() => navigateHome}
+        >
           <div className="flex items-center gap-2">
             <img
               src="/ic-app-icon.png"
@@ -59,13 +67,13 @@ export function Layout() {
               onClick={() => signOut()}
               className="rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
             >
-              Đăng xuất
+              Log out
             </button>
           </nav>
 
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Mở menu"
+            aria-label="Open menu"
             className="rounded p-2 text-slate-600 hover:bg-slate-100 md:hidden"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -88,7 +96,7 @@ export function Layout() {
               onClick={() => signOut()}
               className="block w-full rounded px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100"
             >
-              Đăng xuất
+              Log out
             </button>
           </nav>
         )}
@@ -100,7 +108,7 @@ export function Layout() {
 
       <button
         onClick={() => setQuickLogOpen(true)}
-        aria-label="Ghi giao dịch nhanh"
+        aria-label="Add transaction"
         className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white shadow-lg hover:bg-slate-800"
       >
         <Plus size={24} />

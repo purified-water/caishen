@@ -54,7 +54,7 @@ export function CategoriesSettings() {
             tab === 'expense' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'
           }`}
         >
-          Chi tiêu
+          Expense
         </button>
         <button
           onClick={() => setTab('income')}
@@ -62,7 +62,7 @@ export function CategoriesSettings() {
             tab === 'income' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600'
           }`}
         >
-          Thu nhập
+          Income
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export function CategoriesSettings() {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={`Tên danh mục ${tab === 'expense' ? 'chi tiêu' : 'thu nhập'}`}
+          placeholder={`${tab === 'expense' ? 'Expense' : 'Income'} category name`}
           className="min-w-0 flex-1 rounded border border-slate-300 px-3 py-2 text-sm"
         />
         <button
@@ -78,14 +78,14 @@ export function CategoriesSettings() {
           disabled={createCategory.isPending}
           className="shrink-0 rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          Thêm
+          Add
         </button>
       </form>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Đang tải...</p>
+        <p className="text-sm text-slate-500">Loading...</p>
       ) : filtered.length === 0 ? (
-        <p className="text-sm text-slate-500">Chưa có danh mục nào.</p>
+        <p className="text-sm text-slate-500">No categories yet.</p>
       ) : (
         <ul className="divide-y divide-slate-200 rounded border border-slate-200 bg-white">
           {filtered.map((category) => (

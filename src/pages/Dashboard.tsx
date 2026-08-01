@@ -6,7 +6,7 @@ export function Dashboard() {
   return (
     <div className="space-y-2">
       <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
-      <p className="text-slate-600">Đã đăng nhập: {user?.email}</p>
+      <p className="text-slate-600">Logged in as: {user?.email}</p>
     </div>
   )
 }

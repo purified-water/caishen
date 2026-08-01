@@ -25,7 +25,7 @@ export function nextMonthKey(monthKey: string): string {
 export function formatMonthLabel(monthKey: string): string {
   const [year, month] = monthKey.split('-').map(Number)
   const date = new Date(Date.UTC(year, month - 1, 1))
-  return date.toLocaleDateString('vi-VN', {
+  return date.toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',

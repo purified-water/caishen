@@ -64,7 +64,7 @@ export function useCreateMonthlyBudget() {
         .eq('month', month)
         .maybeSingle()
       if (existingError) throw existingError
-      if (existing) throw new Error('Tháng này đã tồn tại')
+      if (existing) throw new Error('This month already exists')
 
       const { data: previous, error: previousError } = await supabase
         .from('monthly_budgets')

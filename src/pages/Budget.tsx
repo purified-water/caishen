@@ -51,7 +51,7 @@ function BudgetDetailRow({
       <td className="px-2 py-2 text-right">
         <button
           onClick={() => removeDetail.mutate(detail.id)}
-          title="Bỏ danh mục này khỏi tháng"
+          title="Remove this category from the month"
           className="rounded p-1.5 text-red-500 hover:bg-red-50"
         >
           <Trash2 size={16} />
@@ -118,7 +118,7 @@ function AddCategoryToBudget({
         onChange={(e) => setCategoryId(e.target.value)}
         className="min-w-0 flex-1 rounded border border-slate-300 px-3 py-2 text-sm"
       >
-        <option value="">+ Thêm danh mục vào tháng này...</option>
+        <option value="">+ Add category to this month...</option>
         {available.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}
@@ -130,7 +130,7 @@ function AddCategoryToBudget({
         disabled={!categoryId || upsertDetail.isPending}
         className="shrink-0 rounded border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
       >
-        Thêm
+        Add
       </button>
     </div>
   )
@@ -163,18 +163,18 @@ export function Budget() {
 
     createBudget.mutate(monthKey, {
       onSuccess: (newBudget) => setSelectedMonthId(newBudget.id),
-      onError: (err) => setError(err instanceof Error ? err.message : 'Tạo tháng thất bại'),
+      onError: (err) => setError(err instanceof Error ? err.message : 'Failed to create month'),
     })
   }
 
   function handleDeleteMonth() {
     if (!selectedBudget) return
     const label = formatMonthLabel(selectedBudget.month.slice(0, 7))
-    if (!window.confirm(`Xóa tháng ${label}? Toàn bộ budget của tháng này sẽ mất.`)) return
+    if (!window.confirm(`Delete ${label}? This month's entire budget will be lost.`)) return
 
     deleteBudget.mutate(selectedBudget.id, {
       onSuccess: () => setSelectedMonthId(null),
-      onError: (err) => setError(err instanceof Error ? err.message : 'Xóa tháng thất bại'),
+      onError: (err) => setError(err instanceof Error ? err.message : 'Failed to delete month'),
     })
   }
 
@@ -187,17 +187,17 @@ export function Budget() {
           disabled={createBudget.isPending}
           className="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          + Tạo tháng mới
+          + Create new month
         </button>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Đang tải...</p>
+        <p className="text-sm text-slate-500">Loading...</p>
       ) : !budgets || budgets.length === 0 ? (
         <p className="text-sm text-slate-500">
-          Chưa có tháng ngân sách nào. Bấm "Tạo tháng mới" để bắt đầu.
+          No budget months yet. Click "Create new month" to get started.
         </p>
       ) : (
         <>
@@ -219,7 +219,7 @@ export function Budget() {
                 disabled={deleteBudget.isPending}
                 className="rounded border border-red-200 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
               >
-                Xóa tháng
+                Delete month
               </button>
             )}
           </div>
@@ -234,10 +234,10 @@ export function Budget() {
               </div>
 
               {detailsLoading ? (
-                <p className="text-sm text-slate-500">Đang tải danh mục...</p>
+                <p className="text-sm text-slate-500">Loading categories...</p>
               ) : !details || details.length === 0 ? (
                 <p className="text-sm text-slate-500">
-                  Chưa có danh mục chi tiêu nào để lập ngân sách.
+                  No expense categories to budget yet.
                 </p>
               ) : (
                 <div className="overflow-x-auto rounded border border-slate-200 bg-white">
