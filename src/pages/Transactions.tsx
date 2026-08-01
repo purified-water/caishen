@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, X } from "lucide-react";
+import { Check, Trash2, X } from "lucide-react";
 import { MoneyInput } from "../components/MoneyInput";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useMonthlyBudgets } from "../hooks/useMonthlyBudgets";
 import {
+  useDeleteTransaction,
   useTransactionsList,
   useUpdateTransaction,
   type TransactionFilters,
@@ -26,6 +27,7 @@ function TransactionRow({
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
   const updateTransaction = useUpdateTransaction();
+  const deleteTransaction = useDeleteTransaction();
 
   const [editing, setEditing] = useState(false);
   const [date, setDate] = useState(transaction.date);
@@ -72,6 +74,11 @@ function TransactionRow({
       },
       { onSuccess: () => setEditing(false) },
     );
+  }
+
+  function handleDelete() {
+    if (!window.confirm("Delete this transaction?")) return
+    deleteTransaction.mutate(transaction.id)
   }
 
   if (editing) {
@@ -184,6 +191,12 @@ function TransactionRow({
               className="rounded p-1.5 text-slate-500 hover:bg-slate-200"
             >
               <X size={16} />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="rounded p-1.5 text-red-500 hover:bg-red-100"
+            >
+              <Trash2 size={16} />
             </button>
           </div>
         </td>
