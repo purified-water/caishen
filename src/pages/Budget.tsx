@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Trash2 } from 'lucide-react'
+import { MoneyInput } from '../components/MoneyInput'
 import { useCategories } from '../hooks/useCategories'
 import {
   useBudgetDetails,
@@ -40,10 +41,9 @@ function BudgetDetailRow({
         {detail.category.name}
       </td>
       <td className="px-4 py-2 text-right">
-        <input
-          type="number"
+        <MoneyInput
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={setValue}
           onBlur={handleBlur}
           className="w-28 rounded border border-slate-300 px-2 py-1 text-right text-sm"
         />
@@ -76,10 +76,9 @@ function StartBalanceEditor({ budget }: { budget: MonthlyBudget }) {
   }
 
   return (
-    <input
-      type="number"
+    <MoneyInput
       value={value}
-      onChange={(e) => setValue(e.target.value)}
+      onChange={setValue}
       onBlur={handleBlur}
       className="w-40 rounded border border-slate-300 px-2 py-1 text-sm"
     />

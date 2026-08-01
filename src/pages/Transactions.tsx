@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
+import { MoneyInput } from "../components/MoneyInput";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useMonthlyBudgets } from "../hooks/useMonthlyBudgets";
@@ -156,10 +157,9 @@ function TransactionRow({
           )}
         </td>
         <td className="px-3 py-2">
-          <input
-            type="number"
+          <MoneyInput
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={setAmount}
             className="w-28 rounded border border-slate-300 px-2 py-1 text-right text-sm"
           />
         </td>

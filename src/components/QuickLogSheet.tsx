@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
+import { MoneyInput } from './MoneyInput'
 import { useAccounts } from '../hooks/useAccounts'
 import { useCategories } from '../hooks/useCategories'
 import { useCreateTransaction } from '../hooks/useTransactions'
@@ -208,11 +209,9 @@ export function QuickLogSheet({ onClose }: { onClose: () => void }) {
               <label className="text-sm font-medium text-slate-700">
                 Amount
               </label>
-              <input
-                type="number"
-                inputMode="decimal"
+              <MoneyInput
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={setAmount}
                 className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
               />
             </div>
