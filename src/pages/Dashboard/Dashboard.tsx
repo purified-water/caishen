@@ -1,3 +1,4 @@
+import { RefreshCw } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -64,6 +65,8 @@ export function Dashboard() {
     selectedMonthId,
     setSelectedMonthId,
     selectedBudget,
+    refresh,
+    refreshing,
     kpis,
     accountBreakdowns,
     budgetVsActual,
@@ -79,7 +82,17 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-semibold text-slate-900">Dashboard</h1>
+          <button
+            onClick={refresh}
+            disabled={refreshing}
+            aria-label="Refresh data"
+            className="flex items-center gap-1.5 rounded border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+          </button>
+        </div>
         {budgets.length > 0 && (
           <select
             value={selectedMonthId ?? ""}

@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCategories } from "../../hooks/useCategories";
@@ -19,10 +20,25 @@ const TOP_CATEGORIES_COUNT = 10;
 
 export function useDashboardViewModel() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const { data: budgets, isLoading: budgetsLoading } = useMonthlyBudgets();
   const { data: categories } = useCategories();
   const [selectedMonthId, setSelectedMonthId] = useState<string | null>(null);
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+        queryClient.invalidateQueries({ queryKey: ["monthly_budgets"] }),
+        queryClient.invalidateQueries({ queryKey: ["month_transactions"] }),
+      ]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (!selectedMonthId && budgets && budgets.length > 0) {
@@ -189,6 +205,8 @@ export function useDashboardViewModel() {
     selectedMonthId,
     setSelectedMonthId,
     selectedBudget,
+    refresh,
+    refreshing,
     kpis,
     accountBreakdowns,
     budgetVsActual,

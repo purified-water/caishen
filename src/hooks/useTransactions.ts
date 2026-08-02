@@ -47,9 +47,11 @@ export function useCreateTransaction() {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['monthly_budgets'] })
-      queryClient.invalidateQueries({ queryKey: ['month_transactions'] })
+      // Mark stale without refetching to avoid an extra read on every quick-log
+      // add; the header refresh button lets the user pull fresh data on demand.
+      queryClient.invalidateQueries({ queryKey: ['transactions'], refetchType: 'none' })
+      queryClient.invalidateQueries({ queryKey: ['monthly_budgets'], refetchType: 'none' })
+      queryClient.invalidateQueries({ queryKey: ['month_transactions'], refetchType: 'none' })
     },
   })
 }
