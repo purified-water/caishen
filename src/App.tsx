@@ -8,6 +8,7 @@ import { Register } from './pages/Register/Register'
 import { Dashboard } from './pages/Dashboard/Dashboard'
 import { Budget } from './pages/Budget/Budget'
 import { Transactions } from './pages/Transactions/Transactions'
+import { Debts } from './pages/Debts/Debts'
 import { CategoriesSettings } from './pages/settings/Categories/Categories'
 import { AccountsSettings } from './pages/settings/Accounts/Accounts'
 
@@ -31,6 +32,7 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/budget" element={<Budget />} />
               <Route path="/transactions" element={<Transactions />} />
+              <Route path="/debts" element={<Debts />} />
               <Route path="/settings/categories" element={<CategoriesSettings />} />
               <Route path="/settings/accounts" element={<AccountsSettings />} />
             </Route>

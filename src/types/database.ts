@@ -7,6 +7,7 @@ export type Category = {
   name: string
   type: CategoryType
   icon: string | null
+  is_debt_related: boolean
   created_at: string
 }
 
@@ -63,11 +64,15 @@ export type Transaction = {
   from_account_id: string | null
   to_account_id: string | null
   description: string | null
+  counterparty_name: string | null
+  is_settled: boolean
+  settled_transaction_id: string | null
+  expect_repayment: boolean
   created_at: string
 }
 
 export type TransactionWithRelations = Transaction & {
-  category: Pick<Category, 'id' | 'name'> | null
+  category: Pick<Category, 'id' | 'name' | 'is_debt_related'> | null
   from_account: Pick<Account, 'id' | 'name'> | null
   to_account: Pick<Account, 'id' | 'name'> | null
 }

@@ -31,6 +31,11 @@ export function QuickLogSheet({ onClose }: QuickLogSheetProps) {
     setFromAccountId,
     toAccountId,
     setToAccountId,
+    isDebtRelated,
+    counterpartyName,
+    setCounterpartyName,
+    expectRepayment,
+    setExpectRepayment,
     error,
     activeAccounts,
     handleSubmit,
@@ -201,6 +206,31 @@ export function QuickLogSheet({ onClose }: QuickLogSheetProps) {
               className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
             />
           </div>
+
+          {isDebtRelated && (
+            <div className="space-y-2 rounded border border-slate-200 bg-slate-50 p-3">
+              <div className="min-w-0 space-y-1">
+                <label className="text-sm font-medium text-slate-700">
+                  Owed by
+                </label>
+                <input
+                  type="text"
+                  value={counterpartyName}
+                  onChange={(e) => setCounterpartyName(e.target.value)}
+                  placeholder="Who owes you this?"
+                  className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
+                />
+              </div>
+              <label className="flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={expectRepayment}
+                  onChange={(e) => setExpectRepayment(e.target.checked)}
+                />
+                Expect repayment
+              </label>
+            </div>
+          )}
 
           {error && <p className="text-sm text-red-600">{error}</p>}
 

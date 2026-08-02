@@ -19,6 +19,8 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
   const [showCategorySuggestions, setShowCategorySuggestions] = useState(false)
   const [fromAccountId, setFromAccountId] = useState('')
   const [toAccountId, setToAccountId] = useState('')
+  const [counterpartyName, setCounterpartyName] = useState('')
+  const [expectRepayment, setExpectRepayment] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const activeAccounts = (accounts ?? []).filter((a) => a.is_active)
@@ -26,10 +28,23 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
     (c) => c.type === (type === 'transfer' ? 'expense' : type),
   )
 
+  const selectedCategory = (categories ?? []).find((c) => c.id === categoryId)
+  const isDebtRelated =
+    type === 'expense' && !!selectedCategory?.is_debt_related
+
   useEffect(() => {
     setCategoryInput('')
     setCategoryId('')
   }, [type])
+
+  // Clear debt-only fields when switching away from a debt-related category
+  // so a stale counterparty/flag doesn't get submitted with an unrelated expense.
+  useEffect(() => {
+    if (!isDebtRelated) {
+      setCounterpartyName('')
+      setExpectRepayment(true)
+    }
+  }, [isDebtRelated])
 
   const categorySuggestions = useMemo(() => {
     const query = categoryInput.trim().toLowerCase()
@@ -71,6 +86,8 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
     setCategoryId('')
     setFromAccountId('')
     setToAccountId('')
+    setCounterpartyName('')
+    setExpectRepayment(true)
     setError(null)
   }
 
@@ -115,6 +132,8 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
         categoryId: type === 'transfer' ? null : categoryId || null,
         fromAccountId: type === 'income' ? null : fromAccountId || null,
         toAccountId: type === 'expense' ? null : toAccountId || null,
+        counterpartyName: isDebtRelated ? counterpartyName || null : null,
+        expectRepayment: isDebtRelated ? expectRepayment : true,
       },
       {
         onSuccess: () => {
@@ -147,6 +166,11 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
     setFromAccountId,
     toAccountId,
     setToAccountId,
+    isDebtRelated,
+    counterpartyName,
+    setCounterpartyName,
+    expectRepayment,
+    setExpectRepayment,
     error,
     activeAccounts,
     handleSubmit,

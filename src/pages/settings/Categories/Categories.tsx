@@ -18,6 +18,7 @@ export function CategoriesSettings() {
     cancelEdit,
     saveEdit,
     handleDelete,
+    toggleDebtRelated,
   } = useCategoriesViewModel()
 
   return (
@@ -83,7 +84,20 @@ export function CategoriesSettings() {
                 </span>
               )}
 
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex shrink-0 items-center gap-2">
+                {editingId !== category.id && (
+                  // "Debt-related" flags a category (e.g. Paid For / Debt Gather)
+                  // as pass-through money — excluded from dashboard KPIs and
+                  // tracked on the /debts page instead.
+                  <label className="flex items-center gap-1 text-xs text-slate-500">
+                    <input
+                      type="checkbox"
+                      checked={category.is_debt_related}
+                      onChange={() => toggleDebtRelated(category)}
+                    />
+                    Debt-related
+                  </label>
+                )}
                 {editingId === category.id ? (
                   <>
                     <button

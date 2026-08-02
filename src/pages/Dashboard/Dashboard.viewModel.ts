@@ -60,6 +60,19 @@ export function useDashboardViewModel() {
     [categories],
   );
 
+  // Categories like "Paid For" / "Debt Gather" are pass-through money (paid
+  // on behalf of someone else, later reimbursed) — excluded from the
+  // category-level charts (Budget vs Actual, Income/Expense breakdown) so
+  // they don't skew spending-habit insight. They are NOT excluded from cash
+  // totals (Total Income/spent, Left over) below — that money still really
+  // left/entered an account, so those must always reflect true balance.
+  const debtCategoryIds = useMemo(
+    () => new Set((categories ?? []).filter((c) => c.is_debt_related).map((c) => c.id)),
+    [categories],
+  );
+  const isPassThrough = (t: { category_id: string | null; expect_repayment: boolean }) =>
+    !!t.category_id && debtCategoryIds.has(t.category_id) && t.expect_repayment;
+
   const kpis: Kpis = useMemo(() => {
     const txns = transactions ?? [];
     const income = txns
@@ -67,6 +80,12 @@ export function useDashboardViewModel() {
       .reduce((sum, t) => sum + Number(t.amount), 0);
     const expense = txns
       .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+    // Budget performance should still ignore pass-through spending (matches
+    // budgetVsActual below), so it isn't dragged down by money paid on
+    // behalf of someone else.
+    const budgetExpense = txns
+      .filter((t) => t.type === "expense" && !isPassThrough(t))
       .reduce((sum, t) => sum + Number(t.amount), 0);
     const budgeted = (details ?? []).reduce(
       (sum, d) => sum + Number(d.budget_amount),
@@ -76,9 +95,9 @@ export function useDashboardViewModel() {
       ? Number(selectedBudget.start_balance)
       : 0;
     const leftOver = startBalance + income - expense;
-    const leftToBudget = budgeted - expense;
+    const leftToBudget = budgeted - budgetExpense;
     return { income, expense, budgeted, startBalance, leftOver, leftToBudget };
-  }, [transactions, details, selectedBudget]);
+  }, [transactions, details, selectedBudget, debtCategoryIds]);
 
   const accountBreakdowns: AccountBreakdowns = useMemo(() => {
     const accounts = accountBalances ?? [];
@@ -120,7 +139,7 @@ export function useDashboardViewModel() {
   const budgetVsActual: BudgetVsActualRow[] = useMemo(() => {
     const actualByCategory = new Map<string, number>();
     (transactions ?? [])
-      .filter((t) => t.type === "expense" && t.category_id)
+      .filter((t) => t.type === "expense" && t.category_id && !isPassThrough(t))
       .forEach((t) => {
         actualByCategory.set(
           t.category_id!,
@@ -135,7 +154,7 @@ export function useDashboardViewModel() {
         Actual: actualByCategory.get(d.category_id) ?? 0,
       }))
       .sort((a, b) => Math.max(b.Budget, b.Actual) - Math.max(a.Budget, a.Actual));
-  }, [details, transactions]);
+  }, [details, transactions, debtCategoryIds]);
 
   const visibleBudgetVsActual = showAllCategories
     ? budgetVsActual
@@ -145,7 +164,7 @@ export function useDashboardViewModel() {
   const incomeBreakdown: PieDatum[] = useMemo(() => {
     const byCategory = new Map<string, number>();
     (transactions ?? [])
-      .filter((t) => t.type === "income")
+      .filter((t) => t.type === "income" && !isPassThrough(t))
       .forEach((t) => {
         const key = t.category_id ?? "uncategorized";
         byCategory.set(key, (byCategory.get(key) ?? 0) + Number(t.amount));
@@ -168,12 +187,12 @@ export function useDashboardViewModel() {
     return rest > 0
       ? [...top, { name: "Other", value: rest, color: COLOR.muted }]
       : top;
-  }, [transactions, categoryNameById]);
+  }, [transactions, categoryNameById, debtCategoryIds]);
 
   const expenseBreakdown: PieDatum[] = useMemo(() => {
     const byCategory = new Map<string, number>();
     (transactions ?? [])
-      .filter((t) => t.type === "expense")
+      .filter((t) => t.type === "expense" && !isPassThrough(t))
       .forEach((t) => {
         const key = t.category_id ?? "uncategorized";
         byCategory.set(key, (byCategory.get(key) ?? 0) + Number(t.amount));
@@ -196,7 +215,7 @@ export function useDashboardViewModel() {
     return rest > 0
       ? [...top, { name: "Other", value: rest, color: COLOR.muted }]
       : top;
-  }, [transactions, categoryNameById]);
+  }, [transactions, categoryNameById, debtCategoryIds]);
 
   return {
     user,

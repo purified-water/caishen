@@ -50,6 +50,15 @@ export function useCategoriesViewModel() {
     deleteCategory.mutate(categoryId)
   }
 
+  function toggleDebtRelated(category: Category) {
+    updateCategory.mutate({
+      id: category.id,
+      name: category.name,
+      type: category.type,
+      isDebtRelated: !category.is_debt_related,
+    })
+  }
+
   return {
     tab,
     setTab,
@@ -66,5 +75,6 @@ export function useCategoriesViewModel() {
     cancelEdit,
     saveEdit,
     handleDelete,
+    toggleDebtRelated,
   }
 }

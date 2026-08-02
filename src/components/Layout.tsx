@@ -7,6 +7,7 @@ import { QuickLogSheet } from "../pages/QuickLogSheet/QuickLogSheet";
 const navItems = [
   { to: "/", label: "Dashboard", end: true },
   { to: "/transactions", label: "Transactions", end: false },
+  { to: "/debts", label: "Debts", end: false },
   { to: "/budget", label: "Budget", end: false },
   { to: "/settings/categories", label: "Categories", end: false },
   { to: "/settings/accounts", label: "Accounts", end: false },

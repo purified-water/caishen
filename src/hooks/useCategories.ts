@@ -25,12 +25,18 @@ export function useCreateCategory() {
   const { user } = useAuth()
 
   return useMutation({
-    mutationFn: async (input: { name: string; type: CategoryType; icon?: string }) => {
+    mutationFn: async (input: {
+      name: string
+      type: CategoryType
+      icon?: string
+      isDebtRelated?: boolean
+    }) => {
       const { error } = await supabase.from('categories').insert({
         user_id: user!.id,
         name: input.name,
         type: input.type,
         icon: input.icon ?? null,
+        is_debt_related: input.isDebtRelated ?? false,
       })
       if (error) throw error
     },
@@ -47,10 +53,18 @@ export function useUpdateCategory() {
       name: string
       type: CategoryType
       icon?: string
+      isDebtRelated?: boolean
     }) => {
       const { error } = await supabase
         .from('categories')
-        .update({ name: input.name, type: input.type, icon: input.icon ?? null })
+        .update({
+          name: input.name,
+          type: input.type,
+          icon: input.icon ?? null,
+          ...(input.isDebtRelated !== undefined && {
+            is_debt_related: input.isDebtRelated,
+          }),
+        })
         .eq('id', input.id)
       if (error) throw error
     },
