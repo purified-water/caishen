@@ -20,15 +20,19 @@ export function QuickLogSheet({ onClose }: QuickLogSheetProps) {
     setAmount,
     description,
     setDescription,
-    categoryId,
-    setCategoryId,
+    categoryInput,
+    categoryError,
+    categorySuggestions,
+    showCategorySuggestions,
+    setShowCategorySuggestions,
+    handleCategoryInputChange,
+    selectCategory,
     fromAccountId,
     setFromAccountId,
     toAccountId,
     setToAccountId,
     error,
     activeAccounts,
-    filteredCategories,
     handleSubmit,
     isSaving,
   } = useQuickLogSheetViewModel(onClose)
@@ -128,22 +132,40 @@ export function QuickLogSheet({ onClose }: QuickLogSheetProps) {
                   ))}
                 </select>
               </div>
-              <div className="min-w-0 space-y-1">
+              <div className="relative min-w-0 space-y-1">
                 <label className="text-sm font-medium text-slate-700">
                   Category
                 </label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
+                <input
+                  type="text"
+                  value={categoryInput}
+                  onChange={(e) => handleCategoryInputChange(e.target.value)}
+                  onFocus={() => setShowCategorySuggestions(true)}
+                  onBlur={() =>
+                    setTimeout(() => setShowCategorySuggestions(false), 100)
+                  }
+                  placeholder="Type to search..."
                   className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
-                >
-                  <option value="">Select category</option>
-                  {filteredCategories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                />
+                {showCategorySuggestions && categorySuggestions.length > 0 && (
+                  <ul className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded border border-slate-200 bg-white shadow-lg">
+                    {categorySuggestions.map((c) => (
+                      <li key={c.id}>
+                        <button
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => selectCategory(c)}
+                          className="block w-full px-3 py-2 text-left text-sm hover:bg-slate-100"
+                        >
+                          {c.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {categoryError && (
+                  <p className="text-xs text-red-600">{categoryError}</p>
+                )}
               </div>
             </div>
           )}

@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useAccounts } from '../../hooks/useAccounts'
 import { useCategories } from '../../hooks/useCategories'
 import { useCreateTransaction } from '../../hooks/useTransactions'
 import { todayDateString } from '../../lib/month'
-import type { TransactionType } from '../../types/database'
+import type { Category, TransactionType } from '../../types/database'
 
 export function useQuickLogSheetViewModel(onClose: () => void) {
   const { data: accounts } = useAccounts()
@@ -14,7 +14,9 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
   const [date, setDate] = useState(todayDateString())
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
+  const [categoryInput, setCategoryInput] = useState('')
   const [categoryId, setCategoryId] = useState('')
+  const [showCategorySuggestions, setShowCategorySuggestions] = useState(false)
   const [fromAccountId, setFromAccountId] = useState('')
   const [toAccountId, setToAccountId] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -24,9 +26,48 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
     (c) => c.type === (type === 'transfer' ? 'expense' : type),
   )
 
+  useEffect(() => {
+    setCategoryInput('')
+    setCategoryId('')
+  }, [type])
+
+  const categorySuggestions = useMemo(() => {
+    const query = categoryInput.trim().toLowerCase()
+    if (!query) return filteredCategories
+    return filteredCategories.filter((c) =>
+      c.name.toLowerCase().includes(query),
+    )
+  }, [filteredCategories, categoryInput])
+
+  const categoryError = useMemo(() => {
+    const query = categoryInput.trim()
+    if (!query) return null
+    const hasExactMatch = filteredCategories.some(
+      (c) => c.name.toLowerCase() === query.toLowerCase(),
+    )
+    return hasExactMatch
+      ? null
+      : 'No matching category. Pick a suggestion or type the exact name.'
+  }, [filteredCategories, categoryInput])
+
+  function handleCategoryInputChange(value: string) {
+    setCategoryInput(value)
+    const match = filteredCategories.find(
+      (c) => c.name.toLowerCase() === value.trim().toLowerCase(),
+    )
+    setCategoryId(match ? match.id : '')
+  }
+
+  function selectCategory(category: Category) {
+    setCategoryInput(category.name)
+    setCategoryId(category.id)
+    setShowCategorySuggestions(false)
+  }
+
   function reset() {
     setAmount('')
     setDescription('')
+    setCategoryInput('')
     setCategoryId('')
     setFromAccountId('')
     setToAccountId('')
@@ -40,6 +81,11 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
     const parsedAmount = Number(amount)
     if (!parsedAmount || parsedAmount <= 0) {
       setError('Amount must be greater than 0')
+      return
+    }
+
+    if (categoryError) {
+      setError(categoryError)
       return
     }
 
@@ -90,15 +136,19 @@ export function useQuickLogSheetViewModel(onClose: () => void) {
     setAmount,
     description,
     setDescription,
-    categoryId,
-    setCategoryId,
+    categoryInput,
+    categoryError,
+    categorySuggestions,
+    showCategorySuggestions,
+    setShowCategorySuggestions,
+    handleCategoryInputChange,
+    selectCategory,
     fromAccountId,
     setFromAccountId,
     toAccountId,
     setToAccountId,
     error,
     activeAccounts,
-    filteredCategories,
     handleSubmit,
     isSaving: createTransaction.isPending,
   }
