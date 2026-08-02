@@ -60,7 +60,8 @@ export function useDashboardViewModel() {
       ? Number(selectedBudget.start_balance)
       : 0;
     const leftOver = startBalance + income - expense;
-    return { income, expense, budgeted, startBalance, leftOver };
+    const leftToBudget = budgeted - expense;
+    return { income, expense, budgeted, startBalance, leftOver, leftToBudget };
   }, [transactions, details, selectedBudget]);
 
   const accountBreakdowns: AccountBreakdowns = useMemo(() => {
@@ -125,14 +126,33 @@ export function useDashboardViewModel() {
     : budgetVsActual.slice(0, TOP_CATEGORIES_COUNT);
   const hiddenCategoryCount = budgetVsActual.length - visibleBudgetVsActual.length;
 
-  const incomeExpenseSavings: PieDatum[] = useMemo(() => {
-    const savings = Math.max(kpis.leftOver, 0);
-    return [
-      { name: "Income", value: kpis.income, color: COLOR.blue },
-      { name: "Expense", value: kpis.expense, color: COLOR.orange },
-      { name: "Savings", value: savings, color: COLOR.aqua },
-    ].filter((d) => d.value > 0);
-  }, [kpis]);
+  const incomeBreakdown: PieDatum[] = useMemo(() => {
+    const byCategory = new Map<string, number>();
+    (transactions ?? [])
+      .filter((t) => t.type === "income")
+      .forEach((t) => {
+        const key = t.category_id ?? "uncategorized";
+        byCategory.set(key, (byCategory.get(key) ?? 0) + Number(t.amount));
+      });
+
+    const sorted = Array.from(byCategory.entries())
+      .map(([id, value]) => ({
+        name:
+          id === "uncategorized"
+            ? "Uncategorized"
+            : (categoryNameById.get(id) ?? "Unknown"),
+        value,
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    const top = sorted
+      .slice(0, 5)
+      .map((d, i) => ({ ...d, color: CATEGORY_COLORS[i] }));
+    const rest = sorted.slice(5).reduce((sum, d) => sum + d.value, 0);
+    return rest > 0
+      ? [...top, { name: "Other", value: rest, color: COLOR.muted }]
+      : top;
+  }, [transactions, categoryNameById]);
 
   const expenseBreakdown: PieDatum[] = useMemo(() => {
     const byCategory = new Map<string, number>();
@@ -176,7 +196,7 @@ export function useDashboardViewModel() {
     hiddenCategoryCount,
     showAllCategories,
     setShowAllCategories,
-    incomeExpenseSavings,
+    incomeBreakdown,
     expenseBreakdown,
     topCategoriesCount: TOP_CATEGORIES_COUNT,
   };

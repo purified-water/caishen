@@ -5,11 +5,13 @@ export function StatCard({
   value,
   tone,
   breakdown,
+  subStat,
 }: {
   label: string;
   value: number;
   tone?: "negative";
   breakdown?: { name: string; value: number }[];
+  subStat?: { label: string; value: number };
 }) {
   return (
     <div className="rounded border border-slate-200 bg-white p-4">
@@ -27,6 +29,16 @@ export function StatCard({
               <span className="ml-2 shrink-0">{formatCurrency(b.value)}</span>
             </p>
           ))}
+        </div>
+      )}
+      {subStat && (
+        <div className="mt-1.5 border-t border-slate-100 pt-1.5">
+          <p className="text-xs font-medium uppercase text-slate-500">
+            {subStat.label}
+          </p>
+          <p className="mt-1 text-lg font-semibold text-slate-900">
+            {formatCurrency(subStat.value)}
+          </p>
         </div>
       )}
     </div>

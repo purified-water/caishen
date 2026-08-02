@@ -49,6 +49,7 @@ export function useCreateTransaction() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['monthly_budgets'] })
+      queryClient.invalidateQueries({ queryKey: ['month_transactions'] })
     },
   })
 }
@@ -131,6 +132,7 @@ export function useUpdateTransaction() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['monthly_budgets'] })
+      queryClient.invalidateQueries({ queryKey: ['month_transactions'] })
     },
   })
 }
@@ -146,6 +148,7 @@ export function useDeleteTransaction() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
       queryClient.invalidateQueries({ queryKey: ['monthly_budgets'] })
+      queryClient.invalidateQueries({ queryKey: ['month_transactions'] })
     },
   })
 }

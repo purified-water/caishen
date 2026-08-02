@@ -4,6 +4,7 @@ export type Kpis = {
   budgeted: number;
   startBalance: number;
   leftOver: number;
+  leftToBudget: number;
 };
 
 export type BreakdownItem = { name: string; value: number };

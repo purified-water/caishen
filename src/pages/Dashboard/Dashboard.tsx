@@ -18,6 +18,44 @@ import { COLOR, formatCurrency } from "../../lib/chartFormat";
 import { formatMonthLabel } from "../../lib/month";
 import { useDashboardViewModel } from "./Dashboard.viewModel";
 
+const RADIAN = Math.PI / 180;
+
+type PieSliceLabelProps = {
+  cx?: number;
+  cy?: number;
+  midAngle?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  percent?: number;
+};
+
+function renderPieSlicePercent({
+  cx = 0,
+  cy = 0,
+  midAngle = 0,
+  innerRadius = 0,
+  outerRadius = 0,
+  percent = 0,
+}: PieSliceLabelProps) {
+  if (percent < 0.04) return null;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#fff"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={11}
+      fontWeight={600}
+    >
+      {`${Math.round(percent * 100)}%`}
+    </text>
+  );
+}
+
 export function Dashboard() {
   const {
     user,
@@ -33,7 +71,7 @@ export function Dashboard() {
     hiddenCategoryCount,
     showAllCategories,
     setShowAllCategories,
-    incomeExpenseSavings,
+    incomeBreakdown,
     expenseBreakdown,
     topCategoriesCount,
   } = useDashboardViewModel();
@@ -72,8 +110,12 @@ export function Dashboard() {
               value={kpis.startBalance}
               breakdown={accountBreakdowns.startBalance}
             />
-            <StatCard label="Income" value={kpis.income} />
-            <StatCard label="Budgeted" value={kpis.budgeted} />
+            <StatCard label="Total Income" value={kpis.income} />
+            <StatCard
+              label="Budgeted"
+              value={kpis.budgeted}
+              subStat={{ label: "Left to budget", value: kpis.leftToBudget }}
+            />
             <StatCard
               label="Total spent"
               value={kpis.expense}
@@ -157,23 +199,23 @@ export function Dashboard() {
           </ChartCard>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <ChartCard title="Income vs Expense vs Savings">
-              {incomeExpenseSavings.length === 0 ? (
-                <p className="text-sm text-slate-500">
-                  No transactions this month.
-                </p>
+            <ChartCard title="Income breakdown by category">
+              {incomeBreakdown.length === 0 ? (
+                <p className="text-sm text-slate-500">No income this month.</p>
               ) : (
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
                     <Pie
-                      data={incomeExpenseSavings}
+                      data={incomeBreakdown}
                       dataKey="value"
                       nameKey="name"
                       innerRadius={60}
                       outerRadius={90}
                       paddingAngle={2}
+                      label={renderPieSlicePercent}
+                      labelLine={false}
                     >
-                      {incomeExpenseSavings.map((entry) => (
+                      {incomeBreakdown.map((entry) => (
                         <Cell
                           key={entry.name}
                           fill={entry.color}
@@ -204,6 +246,8 @@ export function Dashboard() {
                       innerRadius={60}
                       outerRadius={90}
                       paddingAngle={2}
+                      label={renderPieSlicePercent}
+                      labelLine={false}
                     >
                       {expenseBreakdown.map((entry) => (
                         <Cell
