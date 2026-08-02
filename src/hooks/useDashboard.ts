@@ -6,6 +6,8 @@ export type MonthTransaction = {
   amount: number
   type: TransactionType
   category_id: string | null
+  from_account_id: string | null
+  to_account_id: string | null
 }
 
 /** All transactions for one budget month, unpaginated, for KPI/chart aggregation. */
@@ -15,7 +17,7 @@ export function useMonthTransactions(monthlyBudgetId: string | null) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('transactions')
-        .select('amount, type, category_id')
+        .select('amount, type, category_id, from_account_id, to_account_id')
         .eq('monthly_budget_id', monthlyBudgetId!)
       if (error) throw error
       return data as MonthTransaction[]

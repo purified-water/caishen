@@ -32,6 +32,13 @@ export function Layout() {
     window.location.href = "/";
   };
 
+  const handleSignOut = () => {
+    if (!window.confirm("Are you sure you want to log out?")) {
+      return;
+    }
+    signOut();
+  };
+
   useEffect(() => setMenuOpen(false), [location.pathname]);
 
   return (
@@ -39,7 +46,7 @@ export function Layout() {
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
         <div
           className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 cursor-pointer"
-          onClick={() => navigateHome}
+          onClick={navigateHome}
         >
           <div className="flex items-center gap-2">
             <img
@@ -64,7 +71,7 @@ export function Layout() {
               </NavLink>
             ))}
             <button
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="rounded px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
             >
               Log out
@@ -93,7 +100,7 @@ export function Layout() {
               </NavLink>
             ))}
             <button
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="block w-full rounded px-3 py-2.5 text-left text-sm font-medium text-slate-600 hover:bg-slate-100"
             >
               Log out

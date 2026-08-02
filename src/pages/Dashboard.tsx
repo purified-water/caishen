@@ -16,6 +16,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useCategories } from "../hooks/useCategories";
 import { useMonthTransactions } from "../hooks/useDashboard";
 import {
+  useAccountBalances,
   useBudgetDetails,
   useMonthlyBudgets,
 } from "../hooks/useMonthlyBudgets";
@@ -50,10 +51,12 @@ function StatCard({
   label,
   value,
   tone,
+  breakdown,
 }: {
   label: string;
   value: number;
   tone?: "negative";
+  breakdown?: { name: string; value: number }[];
 }) {
   return (
     <div className="rounded border border-slate-200 bg-white p-4">
@@ -63,6 +66,16 @@ function StatCard({
       >
         {formatCurrency(value)}
       </p>
+      {breakdown && breakdown.length > 0 && (
+        <div className="mt-1.5 space-y-0.5 border-t border-slate-100 pt-1.5">
+          {breakdown.map((b) => (
+            <p key={b.name} className="flex justify-between text-xs text-slate-500">
+              <span className="truncate">{b.name}</span>
+              <span className="ml-2 shrink-0">{formatCurrency(b.value)}</span>
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -118,6 +131,9 @@ export function Dashboard() {
   const { data: transactions } = useMonthTransactions(
     selectedBudget?.id ?? null,
   );
+  const { data: accountBalances } = useAccountBalances(
+    selectedBudget?.id ?? null,
+  );
 
   const categoryNameById = useMemo(
     () => new Map((categories ?? []).map((c) => [c.id, c.name])),
@@ -142,6 +158,43 @@ export function Dashboard() {
     const leftOver = startBalance + income - expense;
     return { income, expense, budgeted, startBalance, leftOver };
   }, [transactions, details, selectedBudget]);
+
+  const accountBreakdowns = useMemo(() => {
+    const accounts = accountBalances ?? [];
+    const txns = transactions ?? [];
+
+    const startBalance = accounts.map((b) => ({
+      name: b.account.name,
+      value: Number(b.start_balance),
+    }));
+
+    const totalSpent = accounts.map((b) => {
+      const spent = txns
+        .filter((t) => t.type === "expense" && t.from_account_id === b.account.id)
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+      return { name: b.account.name, value: spent };
+    });
+
+    const leftOver = accounts.map((b) => {
+      const inflow = txns
+        .filter(
+          (t) =>
+            (t.type === "income" && t.to_account_id === b.account.id) ||
+            (t.type === "transfer" && t.to_account_id === b.account.id),
+        )
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+      const outflow = txns
+        .filter(
+          (t) =>
+            (t.type === "expense" && t.from_account_id === b.account.id) ||
+            (t.type === "transfer" && t.from_account_id === b.account.id),
+        )
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+      return { name: b.account.name, value: Number(b.start_balance) + inflow - outflow };
+    });
+
+    return { startBalance, totalSpent, leftOver };
+  }, [accountBalances, transactions]);
 
   const budgetVsActual = useMemo(() => {
     const actualByCategory = new Map<string, number>();
@@ -234,11 +287,24 @@ export function Dashboard() {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            <StatCard label="Start balance" value={kpis.startBalance} />
+            <StatCard
+              label="Start balance"
+              value={kpis.startBalance}
+              breakdown={accountBreakdowns.startBalance}
+            />
             <StatCard label="Income" value={kpis.income} />
             <StatCard label="Budgeted" value={kpis.budgeted} />
-            <StatCard label="Total spent" value={kpis.expense} />
-            <StatCard label="Left over" value={kpis.leftOver} tone="negative" />
+            <StatCard
+              label="Total spent"
+              value={kpis.expense}
+              breakdown={accountBreakdowns.totalSpent}
+            />
+            <StatCard
+              label="Left over"
+              value={kpis.leftOver}
+              tone="negative"
+              breakdown={accountBreakdowns.leftOver}
+            />
           </div>
 
           <ChartCard title="Budget vs Actual by category">
