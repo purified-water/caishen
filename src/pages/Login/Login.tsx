@@ -1,39 +1,9 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { isValidUsername } from '../lib/authEmail'
+import { Link } from 'react-router-dom'
+import { useLoginViewModel } from './Login.viewModel'
 
-export function Register() {
-  const { signUp } = useAuth()
-  const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError(null)
-
-    if (!isValidUsername(username)) {
-      setError('Username must be 3-20 characters: lowercase letters, numbers, . _ -')
-      return
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
-    }
-
-    setSubmitting(true)
-    try {
-      await signUp(username, password)
-      navigate('/', { replace: true })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign up failed')
-    } finally {
-      setSubmitting(false)
-    }
-  }
+export function Login() {
+  const { username, setUsername, password, setPassword, error, submitting, handleSubmit } =
+    useLoginViewModel()
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
@@ -44,7 +14,7 @@ export function Register() {
         <div className="flex flex-col items-center gap-2">
           <img src="/ic-app-icon.png" alt="Caishen" className="h-16 w-16" />
           <h1 className="text-xl font-semibold text-slate-900">
-            Create your Caishen account
+            Log in to Caishen
           </h1>
         </div>
 
@@ -77,13 +47,13 @@ export function Register() {
           disabled={submitting}
           className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {submitting ? "Creating account..." : "Sign up"}
+          {submitting ? "Logging in..." : "Log in"}
         </button>
 
         <p className="text-center text-sm text-slate-600">
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-slate-900 underline">
-            Log in
+          Don't have an account?{" "}
+          <Link to="/register" className="font-medium text-slate-900 underline">
+            Sign up
           </Link>
         </p>
       </form>

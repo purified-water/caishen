@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Plus, X } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { QuickLogSheet } from "./QuickLogSheet";
+import { QuickLogSheet } from "../pages/QuickLogSheet/QuickLogSheet";
 
 const navItems = [
   { to: "/", label: "Dashboard", end: true },
@@ -27,9 +27,10 @@ export function Layout() {
   const [quickLogOpen, setQuickLogOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigateHome = () => {
-    window.location.href = "/";
+    navigate("/");
   };
 
   const handleSignOut = () => {
@@ -44,11 +45,11 @@ export function Layout() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-50">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
-        <div
-          className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 cursor-pointer"
-          onClick={navigateHome}
-        >
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+          <div
+            className="flex cursor-pointer items-center gap-2"
+            onClick={navigateHome}
+          >
             <img
               src="/ic-app-icon.png"
               alt=""

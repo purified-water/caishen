@@ -1,28 +1,9 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { Link } from 'react-router-dom'
+import { useRegisterViewModel } from './Register.viewModel'
 
-export function Login() {
-  const { signIn } = useAuth()
-  const navigate = useNavigate()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError(null)
-    setSubmitting(true)
-    try {
-      await signIn(username, password)
-      navigate('/', { replace: true })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
-    } finally {
-      setSubmitting(false)
-    }
-  }
+export function Register() {
+  const { username, setUsername, password, setPassword, error, submitting, handleSubmit } =
+    useRegisterViewModel()
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
@@ -33,7 +14,7 @@ export function Login() {
         <div className="flex flex-col items-center gap-2">
           <img src="/ic-app-icon.png" alt="Caishen" className="h-16 w-16" />
           <h1 className="text-xl font-semibold text-slate-900">
-            Log in to Caishen
+            Create your Caishen account
           </h1>
         </div>
 
@@ -66,13 +47,13 @@ export function Login() {
           disabled={submitting}
           className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
-          {submitting ? "Logging in..." : "Log in"}
+          {submitting ? "Creating account..." : "Sign up"}
         </button>
 
         <p className="text-center text-sm text-slate-600">
-          Don't have an account?{" "}
-          <Link to="/register" className="font-medium text-slate-900 underline">
-            Sign up
+          Already have an account?{" "}
+          <Link to="/login" className="font-medium text-slate-900 underline">
+            Log in
           </Link>
         </p>
       </form>

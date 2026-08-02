@@ -1,47 +1,24 @@
-import { useState, type FormEvent } from 'react'
 import { Pencil, Trash2, X, Check } from 'lucide-react'
-import {
-  useCategories,
-  useCreateCategory,
-  useDeleteCategory,
-  useUpdateCategory,
-} from '../../hooks/useCategories'
-import type { Category, CategoryType } from '../../types/database'
+import { useCategoriesViewModel } from './Categories.viewModel'
 
 export function CategoriesSettings() {
-  const { data: categories, isLoading } = useCategories()
-  const createCategory = useCreateCategory()
-  const updateCategory = useUpdateCategory()
-  const deleteCategory = useDeleteCategory()
-
-  const [tab, setTab] = useState<CategoryType>('expense')
-  const [name, setName] = useState('')
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingName, setEditingName] = useState('')
-
-  const filtered = (categories ?? []).filter((c) => c.type === tab)
-
-  function handleCreate(e: FormEvent) {
-    e.preventDefault()
-    if (!name.trim()) return
-    createCategory.mutate(
-      { name: name.trim(), type: tab },
-      { onSuccess: () => setName('') },
-    )
-  }
-
-  function startEdit(category: Category) {
-    setEditingId(category.id)
-    setEditingName(category.name)
-  }
-
-  function saveEdit(category: Category) {
-    if (!editingName.trim()) return
-    updateCategory.mutate(
-      { id: category.id, name: editingName.trim(), type: category.type },
-      { onSuccess: () => setEditingId(null) },
-    )
-  }
+  const {
+    tab,
+    setTab,
+    filtered,
+    isLoading,
+    name,
+    setName,
+    isCreating,
+    handleCreate,
+    editingId,
+    editingName,
+    setEditingName,
+    startEdit,
+    cancelEdit,
+    saveEdit,
+    handleDelete,
+  } = useCategoriesViewModel()
 
   return (
     <div className="space-y-6">
@@ -75,7 +52,7 @@ export function CategoriesSettings() {
         />
         <button
           type="submit"
-          disabled={createCategory.isPending}
+          disabled={isCreating}
           className="shrink-0 rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         >
           Add
@@ -116,7 +93,7 @@ export function CategoriesSettings() {
                       <Check size={16} />
                     </button>
                     <button
-                      onClick={() => setEditingId(null)}
+                      onClick={cancelEdit}
                       className="rounded p-1.5 text-slate-500 hover:bg-slate-100"
                     >
                       <X size={16} />
@@ -131,7 +108,7 @@ export function CategoriesSettings() {
                       <Pencil size={16} />
                     </button>
                     <button
-                      onClick={() => deleteCategory.mutate(category.id)}
+                      onClick={() => handleDelete(category.id)}
                       className="rounded p-1.5 text-red-500 hover:bg-red-50"
                     >
                       <Trash2 size={16} />
